@@ -8,59 +8,47 @@ namespace Ranges
 {
     class Range
     {
-        private double from;
-        private double to;
+        public double From { get; set; }
+
+        public double To { get; set; }
 
         public Range(double from, double to)
         {
-            this.from = from;
-            this.to = to;
+            From = from;
+            To = to;
         }
 
-        public double From
-        {
-            get
-            {
-                return from;
-            }
+        public double Length => To - From;
 
-            set
-            {
-                from = value;
-            }
-        }
-
-        public double To
-        {
-            get
-            {
-                return to;
-            }
-
-            set
-            {
-                to = value;
-            }
-        }
-
-        public double Length => to - from;
-
-        public Range clone => new Range(from, to);
+        public Range Clone => new Range(From, To);
 
         public bool IsInside(double x)
         {
-            return (x >= from && x <= to);
+            return (x >= From && x <= To);
+        }
+
+        private const double epsilon = double.Epsilon * 100;
+
+        private bool isEqual(double x, double y)
+        {
+            return Math.Abs(x - y) < epsilon;
         }
 
         public Range GetIntersection(Range other)
         {
-            if (IsInside(other.from))
+            if (isEqual(To, other.From) || isEqual(From, other.To))
             {
-                return new Range(other.from, Math.Min(to, other.to));
+                return null;
             }
-            else if (other.IsInside(from))
+
+
+            if (IsInside(other.From))
             {
-                return new Range(Math.Max(from, other.from), other.to);
+                return new Range(other.From, Math.Min(To, other.To));
+            }
+            else if (other.IsInside(From))
+            {
+                return new Range(Math.Max(From, other.From), other.To);
             }
             else
             {
@@ -70,53 +58,70 @@ namespace Ranges
 
         public Range[] GetUnion(Range other)
         {
-            if (GetIntersection(other) != null)
+            if (IsInside(other.From) || other.IsInside(From))
             {
-                return new[] { new Range(Math.Min(from, other.from), Math.Max(to, other.to)) };
+                return new[] { new Range(Math.Min(From, other.From), Math.Max(To, other.To)) };
             }
             else
             {
-                return new[] { clone, other.clone };
+                return new[] { Clone, other.Clone };
             }
         }
+
+     
+
 
         // здесь разность это интервал(или два интервала), содержащий все числа из
         // первого интервала не содержащиеся во втором интервале
         public Range[] GetDifference(Range other)
         {
-            var fromIsInside = IsInside(other.from);
-            var toIsInside = IsInside(other.to);
-            var range1 = new Range(from, other.from);
-            var range2 = new Range(other.to, to);
+            if (other.IsInside(From) && other.IsInside(To))
+            {
+                return null;
+            }
+
+            if (isEqual(From, other.From))
+            {
+                return new[] { new Range(other.To, To) };
+            }
+
+            if (isEqual(To, other.To))
+            {
+                return new[] { new Range(From, other.From) };
+            }
+
+            var fromIsInside = IsInside(other.From);
+            var toIsInside = IsInside(other.To);
 
             if (fromIsInside && toIsInside)
             {
+                var range1 = new Range(From, other.From);
+                var range2 = new Range(other.To, To);
                 return range1.GetUnion(range2);
             }
             else if (fromIsInside)
             {
-                return new[] { range1 };
+                return new[] { new Range(From, other.From) };
             }
             else if (toIsInside)
             {
-                return new[] { range2 };
+                return new[] { new Range(other.To, To) };
             }
             else
             {
-                return new[] { clone};
+                return new[] { Clone };
             }
         }
 
-        public string Note
-        {
-            get
-            {
-                return $"[{from};{to}]";
-            }
-        }
+        public string Note => $"[{From};{To}]";
 
         public static string GetNotes(Range[] ranges)
         {
+            if (ranges == null)
+            {
+                return "пустое множество";
+            }
+
             var notes = new string[ranges.Length];
             for (var i = 0; i < ranges.Length; i++)
             {
