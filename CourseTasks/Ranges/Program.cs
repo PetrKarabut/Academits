@@ -36,9 +36,9 @@ namespace Ranges
                 Console.WriteLine("Интервалы не пересекаются");
             }
 
-            Console.WriteLine("Объединение: {0}", Range.GetNotes(range1.GetAssociation(range2)));
+            Console.WriteLine("Объединение: {0}", Range.GetNotes(range1.GetUnion(range2)));
 
-            Console.WriteLine("Разность: {0}", Range.GetNotes(range1.GetDifference(range2)));
+            Console.WriteLine("Разность первого и второго интервала: {0}", Range.GetNotes(range1.GetDifference(range2)));
 
             Console.ReadKey();
         }

@@ -10,19 +10,42 @@ namespace Ranges
     {
         private double from;
         private double to;
+
         public Range(double from, double to)
         {
             this.from = from;
             this.to = to;
         }
 
-        public double Length
+        public double From
         {
             get
             {
-                return to - from;
+                return from;
+            }
+
+            set
+            {
+                from = value;
             }
         }
+
+        public double To
+        {
+            get
+            {
+                return to;
+            }
+
+            set
+            {
+                to = value;
+            }
+        }
+
+        public double Length => to - from;
+
+        public Range clone => new Range(from, to);
 
         public bool IsInside(double x)
         {
@@ -45,18 +68,20 @@ namespace Ranges
             }
         }
 
-        public Range[] GetAssociation(Range other)
+        public Range[] GetUnion(Range other)
         {
             if (GetIntersection(other) != null)
             {
-                return new Range[] { new Range(Math.Min(from, other.from), Math.Max(to, other.to)) };
+                return new[] { new Range(Math.Min(from, other.from), Math.Max(to, other.to)) };
             }
             else
             {
-                return new Range[] { this, other };
+                return new[] { clone, other.clone };
             }
         }
 
+        // здесь разность это интервал(или два интервала), содержащий все числа из
+        // первого интервала не содержащиеся во втором интервале
         public Range[] GetDifference(Range other)
         {
             var fromIsInside = IsInside(other.from);
@@ -66,19 +91,19 @@ namespace Ranges
 
             if (fromIsInside && toIsInside)
             {
-                return range1.GetAssociation(range2);
+                return range1.GetUnion(range2);
             }
             else if (fromIsInside)
             {
-                return new Range[] { range1 };
+                return new[] { range1 };
             }
             else if (toIsInside)
             {
-                return new Range[] { range2 };
+                return new[] { range2 };
             }
             else
             {
-                return new Range[] { this };
+                return new[] { clone};
             }
         }
 
@@ -86,14 +111,14 @@ namespace Ranges
         {
             get
             {
-                return string.Format("[{0};{1}]", from, to);
+                return $"[{from};{to}]";
             }
         }
 
         public static string GetNotes(Range[] ranges)
         {
             var notes = new string[ranges.Length];
-            for (int i = 0; i < ranges.Length; i++)
+            for (var i = 0; i < ranges.Length; i++)
             {
                 notes[i] = ranges[i].Note;
             }
