@@ -34,6 +34,11 @@ namespace Ranges
                 return null;
             }
 
+            if (other.IsInside(From) && other.IsInside(To))
+            {
+                return Clone;
+            }
+
             if (IsInside(other.From))
             {
                 return new Range(other.From, Math.Min(To, other.To));
@@ -84,7 +89,7 @@ namespace Ranges
             {
                 var range1 = new Range(From, other.From);
                 var range2 = new Range(other.To, To);
-                return new[] { range1.Clone, range2.Clone };
+                return new[] { range1, range2 };
             }
 
             if (fromIsInside)
