@@ -27,33 +27,25 @@ namespace Ranges
             return (x >= From && x <= To);
         }
 
-        private const double epsilon = double.Epsilon * 100;
-
-        private bool isEqual(double x, double y)
-        {
-            return Math.Abs(x - y) < epsilon;
-        }
-
         public Range GetIntersection(Range other)
         {
-            if (isEqual(To, other.From) || isEqual(From, other.To))
+            if (To == other.From || From == other.To)
             {
                 return null;
             }
-
 
             if (IsInside(other.From))
             {
                 return new Range(other.From, Math.Min(To, other.To));
             }
-            else if (other.IsInside(From))
+
+            if (other.IsInside(From))
             {
                 return new Range(Math.Max(From, other.From), other.To);
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
+
         }
 
         public Range[] GetUnion(Range other)
@@ -62,14 +54,9 @@ namespace Ranges
             {
                 return new[] { new Range(Math.Min(From, other.From), Math.Max(To, other.To)) };
             }
-            else
-            {
-                return new[] { Clone, other.Clone };
-            }
+
+            return new[] { Clone, other.Clone };
         }
-
-     
-
 
         // здесь разность это интервал(или два интервала), содержащий все числа из
         // первого интервала не содержащиеся во втором интервале
@@ -77,15 +64,15 @@ namespace Ranges
         {
             if (other.IsInside(From) && other.IsInside(To))
             {
-                return null;
+                return new Range[0];
             }
 
-            if (isEqual(From, other.From))
+            if (From == other.From)
             {
                 return new[] { new Range(other.To, To) };
             }
 
-            if (isEqual(To, other.To))
+            if (To == other.To)
             {
                 return new[] { new Range(From, other.From) };
             }
@@ -97,27 +84,27 @@ namespace Ranges
             {
                 var range1 = new Range(From, other.From);
                 var range2 = new Range(other.To, To);
-                return range1.GetUnion(range2);
+                return new[] { range1.Clone, range2.Clone };
             }
-            else if (fromIsInside)
+
+            if (fromIsInside)
             {
                 return new[] { new Range(From, other.From) };
             }
-            else if (toIsInside)
+
+            if (toIsInside)
             {
                 return new[] { new Range(other.To, To) };
             }
-            else
-            {
-                return new[] { Clone };
-            }
+
+            return new[] { Clone };
         }
 
         public string Note => $"[{From};{To}]";
 
         public static string GetNotes(Range[] ranges)
         {
-            if (ranges == null)
+            if (ranges.Length == 0)
             {
                 return "пустое множество";
             }
