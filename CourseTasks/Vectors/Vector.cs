@@ -14,7 +14,7 @@ namespace Vectors
         {
             if (size <= 0)
             {
-                throw new ArgumentException();
+                throw new ArgumentException("размерность вектора меньше единицы", "size");
             }
 
             components = new double[size];
@@ -23,10 +23,7 @@ namespace Vectors
         public Vector(int size, double[] array) : this(size)
         {
             var minimum = Math.Min(size, array.Length);
-            for (var i = 0; i < minimum; i++)
-            {
-                components[i] = array[i];
-            }
+            Array.Copy(array, components, minimum);
         }
 
         public Vector(double[] array) : this(array.Length, array)
@@ -49,49 +46,38 @@ namespace Vectors
             return new Vector(size, components);
         }
 
-        public Vector Plus(Vector other)
+        public void Plus(Vector other)
         {
-            var maximumSize = Math.Max(Size, other.Size);
+            var minimumSize = Math.Min(Size, other.Size);
 
-            var vector1 = Cut(maximumSize);
-            var vector2 = other.Cut(maximumSize);
-
-            for (var i = 0; i < maximumSize; i++)
+            for (var i = 0; i < minimumSize; i++)
             {
-                vector1.components[i] += vector2.components[i];
+                components[i] += other.components[i];
             }
-
-            return vector1;
         }
 
-        public Vector Minus(Vector other)
+        public void Minus(Vector other)
         {
-            var maximumSize = Math.Max(Size, other.Size);
+            var minimumSize = Math.Min(Size, other.Size);
 
-            var vector1 = Cut(maximumSize);
-            var vector2 = other.Cut(maximumSize);
-
-            for (var i = 0; i < maximumSize; i++)
+            for (var i = 0; i < minimumSize; i++)
             {
-                vector1.components[i] -= vector2.components[i];
+                components[i] -= other.components[i];
             }
-
-            return vector1;
         }
 
-        public Vector Multiply(double x)
+        public void Multiply(double x)
         {
-            var vector = new Vector(this);
-
             for (var i = 0; i < Size; i++)
             {
-                vector.components[i] *= x;
+                components[i] *= x;
             }
-
-            return vector;
         }
 
-        public Vector Opposite => Multiply(-1);
+        public void Turn()
+        {
+            Multiply(-1);
+        }
 
         public double Magnitude => Math.Sqrt(Dot(this, this));
 
@@ -105,40 +91,34 @@ namespace Vectors
             components[i] = value;
         }
 
-        public const double epsilon = double.Epsilon * 100;
+        private const double epsilon = double.Epsilon * 100;
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj == null || GetType() != obj.GetType())
             {
                 return false;
             }
 
-            var other = obj as Vector;
-            if (other == null)
-            {
-                return false;
-            }
+            var other = (Vector)obj;
 
-            return Size == other.Size && Minus(other).Magnitude < epsilon;
+            return Size == other.Size && Difference(this, other).Magnitude < epsilon;
         }
 
         public override int GetHashCode()
         {
-            return Size;
+            const int factor = 100;
+            return (int)Math.Truncate(Magnitude * factor);
         }
 
         public static double Dot(Vector v, Vector w)
         {
-            var maximumSize = Math.Max(v.Size, w.Size);
-
-            var vector1 = v.Cut(maximumSize);
-            var vector2 = w.Cut(maximumSize);
+            var minimumSize = Math.Min(v.Size, w.Size);
 
             double dot = 0;
-            for (var i = 0; i < maximumSize; i++)
+            for (var i = 0; i < minimumSize; i++)
             {
-                dot += vector1.components[i] * vector2.components[i];
+                dot += w.components[i] * v.components[i];
             }
 
             return dot;
@@ -146,12 +126,22 @@ namespace Vectors
 
         public static Vector Sum(Vector vector1, Vector vector2)
         {
-            return vector1.Plus(vector2);
+            var maximumSize = Math.Max(vector1.Size, vector2.Size);
+
+            var vector = vector1.Cut(maximumSize);
+            vector.Plus(vector2.Cut(maximumSize));
+
+            return vector;
         }
 
         public static Vector Difference(Vector vector1, Vector vector2)
         {
-            return vector1.Minus(vector2);
+            var maximumSize = Math.Max(vector1.Size, vector2.Size);
+
+            var vector = vector1.Cut(maximumSize);
+            vector.Minus(vector2.Cut(maximumSize));
+
+            return vector;
         }
     }
 }
