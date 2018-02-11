@@ -41,33 +41,38 @@ namespace Vectors
             return $"({string.Join(";", components)})";
         }
 
-        public Vector Cut(int size)
-        {
-            return new Vector(size, components);
-        }
-
         public void Plus(Vector other)
         {
-            var vector = Size < other.Size ? Cut(other.Size) : this;
+            var array = components;
+            if (Size < other.Size)
+            {
+                array = new double[other.Size];
+                Array.Copy(components, array, Size);
+            }
 
             for (var i = 0; i < other.Size; i++)
             {
-                vector.components[i] += other.components[i];
+                array[i] += other.components[i];
             }
 
-            components = vector.components;
+            components = array;
         }
 
         public void Minus(Vector other)
         {
-            var vector = Size < other.Size ? Cut(other.Size) : this;
+            var array = components;
+            if (Size < other.Size)
+            {
+                array = new double[other.Size];
+                Array.Copy(components, array, Size);
+            }
 
             for (var i = 0; i < other.Size; i++)
             {
-                vector.components[i] -= other.components[i];
+                array[i] -= other.components[i];
             }
 
-            components = vector.components;
+            components = array;
         }
 
         public void Multiply(double x)
@@ -104,34 +109,32 @@ namespace Vectors
 
         public override bool Equals(object obj)
         {
-            if (obj == null || GetType() != typeof(Vector) || GetType() != obj.GetType())
+            if (obj == this)
+            {
+                return true;
+            }
+
+            if (obj == null || GetType() != obj.GetType())
             {
                 return false;
             }
 
             var other = (Vector)obj;
 
-            if (other == this)
-            {
-                return true;
-            }
-
             if (Size != other.Size)
             {
                 return false;
             }
 
-            bool equal = true;
-
             for (var i = 0; i < Size; i++)
             {
                 if (components[i] != other.components[i])
                 {
-                    equal = false;
+                    return false;
                 }
             }
 
-            return equal;
+            return true;
         }
 
         public override int GetHashCode()
@@ -155,20 +158,26 @@ namespace Vectors
 
         public static Vector Sum(Vector vector1, Vector vector2)
         {
-            var maximumSize = Math.Max(vector1.Size, vector2.Size);
-
-            var vector = vector1.Cut(maximumSize);
-            vector.Plus(vector2.Cut(maximumSize));
+            var vector = new Vector(Math.Max(vector1.Size, vector2.Size));
+            for (var i = 0; i < vector.Size; i++)
+            {
+                var v = i < vector1.Size ? vector1.components[i] : 0;
+                var w = i < vector2.Size ? vector2.components[i] : 0;
+                vector.components[i] = v + w;
+            }
 
             return vector;
         }
 
         public static Vector Difference(Vector vector1, Vector vector2)
         {
-            var maximumSize = Math.Max(vector1.Size, vector2.Size);
-
-            var vector = vector1.Cut(maximumSize);
-            vector.Minus(vector2.Cut(maximumSize));
+            var vector = new Vector(Math.Max(vector1.Size, vector2.Size));
+            for (var i = 0; i < vector.Size; i++)
+            {
+                var v = i < vector1.Size ? vector1.components[i] : 0;
+                var w = i < vector2.Size ? vector2.components[i] : 0;
+                vector.components[i] = v - w;
+            }
 
             return vector;
         }
