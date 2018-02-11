@@ -48,22 +48,26 @@ namespace Vectors
 
         public void Plus(Vector other)
         {
-            var minimumSize = Math.Min(Size, other.Size);
+            var vector = Size < other.Size ? Cut(other.Size) : this;
 
-            for (var i = 0; i < minimumSize; i++)
+            for (var i = 0; i < other.Size; i++)
             {
-                components[i] += other.components[i];
+                vector.components[i] += other.components[i];
             }
+
+            components = vector.components;
         }
 
         public void Minus(Vector other)
         {
-            var minimumSize = Math.Min(Size, other.Size);
+            var vector = Size < other.Size ? Cut(other.Size) : this;
 
-            for (var i = 0; i < minimumSize; i++)
+            for (var i = 0; i < other.Size; i++)
             {
-                components[i] -= other.components[i];
+                vector.components[i] -= other.components[i];
             }
+
+            components = vector.components;
         }
 
         public void Multiply(double x)
@@ -93,16 +97,41 @@ namespace Vectors
 
         private const double epsilon = double.Epsilon * 100;
 
+        public static bool AreNear(Vector v, Vector w)
+        {
+            return Difference(v, w).Magnitude < epsilon;
+        }
+
         public override bool Equals(object obj)
         {
-            if (obj == null || GetType() != obj.GetType())
+            if (obj == null || GetType() != typeof(Vector) || GetType() != obj.GetType())
             {
                 return false;
             }
 
             var other = (Vector)obj;
 
-            return Size == other.Size && Difference(this, other).Magnitude < epsilon;
+            if (other == this)
+            {
+                return true;
+            }
+
+            if (Size != other.Size)
+            {
+                return false;
+            }
+
+            bool equal = true;
+
+            for (var i = 0; i < Size; i++)
+            {
+                if (components[i] != other.components[i])
+                {
+                    equal = false;
+                }
+            }
+
+            return equal;
         }
 
         public override int GetHashCode()
