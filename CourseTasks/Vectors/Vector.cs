@@ -158,27 +158,15 @@ namespace Vectors
 
         public static Vector Sum(Vector vector1, Vector vector2)
         {
-            var vector = new Vector(Math.Max(vector1.Size, vector2.Size));
-            for (var i = 0; i < vector.Size; i++)
-            {
-                var v = i < vector1.Size ? vector1.components[i] : 0;
-                var w = i < vector2.Size ? vector2.components[i] : 0;
-                vector.components[i] = v + w;
-            }
-
+            var vector = new Vector(vector1);
+            vector.Plus(vector2);
             return vector;
         }
 
         public static Vector Difference(Vector vector1, Vector vector2)
         {
-            var vector = new Vector(Math.Max(vector1.Size, vector2.Size));
-            for (var i = 0; i < vector.Size; i++)
-            {
-                var v = i < vector1.Size ? vector1.components[i] : 0;
-                var w = i < vector2.Size ? vector2.components[i] : 0;
-                vector.components[i] = v - w;
-            }
-
+            var vector = new Vector(vector1);
+            vector.Minus(vector2);
             return vector;
         }
     }
