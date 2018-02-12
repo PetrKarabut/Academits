@@ -10,7 +10,7 @@ namespace Shapes
     {
         public int Compare(IShape x, IShape y)
         {
-            return x.getPerimeter().CompareTo(y.getPerimeter());
+            return x.GetPerimeter().CompareTo(y.GetPerimeter());
         }
     }
 }

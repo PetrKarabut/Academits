@@ -48,7 +48,7 @@ namespace Shapes
         private static void WriteInfo(IShape shape)
         {
             Console.WriteLine(shape);
-            Console.WriteLine("Ширина {0}; Высота {1}; Периметр {2}; Площадь {3}", shape.getWidth(), shape.getHeight(), shape.getPerimeter(), shape.getArea());
+            Console.WriteLine("Ширина {0}; Высота {1}; Периметр {2}; Площадь {3}", shape.GetWidth(), shape.GetHeight(), shape.GetPerimeter(), shape.GetArea());
             Console.WriteLine();
         }
 

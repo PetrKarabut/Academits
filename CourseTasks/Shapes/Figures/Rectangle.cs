@@ -17,19 +17,19 @@ namespace Shapes
             this.bSide = bSide;
         }
 
-        public double getWidth()
+        public double GetWidth()
         {
             return Math.Max(aSide, bSide);
         }
-        public double getHeight()
+        public double GetHeight()
         {
             return Math.Min(aSide, bSide);
         }
-        public double getArea()
+        public double GetArea()
         {
             return aSide * bSide;
         }
-        public double getPerimeter()
+        public double GetPerimeter()
         {
             return 2 * (aSide + bSide);
         }
@@ -54,7 +54,7 @@ namespace Shapes
         public override int GetHashCode()
         {
             const int factor = 100;
-            return (int)Math.Truncate(getPerimeter() * factor);
+            return (int)Math.Truncate(GetPerimeter() * factor);
         }
 
         public override string ToString()

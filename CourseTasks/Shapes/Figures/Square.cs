@@ -15,22 +15,22 @@ namespace Shapes
             this.side = side;
         }
 
-        public  double getArea()
+        public  double GetArea()
         {
             return side * side;
         }
 
-        public  double getPerimeter()
+        public  double GetPerimeter()
         {
             return 4 * side;
         }
 
-        public  double getWidth()
+        public  double GetWidth()
         {
             return side;
         }
 
-        public  double getHeight()
+        public  double GetHeight()
         {
             return side;
         }
@@ -55,7 +55,7 @@ namespace Shapes
         public override int GetHashCode()
         {
             const int factor = 100;
-            return (int)Math.Truncate(getPerimeter() * factor);
+            return (int)Math.Truncate(GetPerimeter() * factor);
         }
 
         public override string ToString()

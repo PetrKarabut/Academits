@@ -16,22 +16,22 @@ namespace Shapes
         }
 
        
-        public double getArea()
+        public double GetArea()
         {
             return Math.PI * radius * radius;
         }
 
-        public double getPerimeter()
+        public double GetPerimeter()
         {
             return 2 * Math.PI * radius;
         }
 
-        public double getWidth()
+        public double GetWidth()
         {
             return 2 * radius;
         }
 
-        public double getHeight()
+        public double GetHeight()
         {
             return 2 * radius;
         }
@@ -57,7 +57,7 @@ namespace Shapes
         public override int GetHashCode()
         {
             const int factor = 100;
-            return (int)Math.Truncate(getPerimeter() * factor); 
+            return (int)Math.Truncate(GetPerimeter() * factor); 
         }
 
         public override string ToString()

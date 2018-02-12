@@ -8,49 +8,58 @@ namespace Shapes
 {
     class Triangle : IShape
     {
-        private double side1;
-        private double side2;
-        private double side3;
+        private double x1;
+        private double x2;
+        private double x3;
+        private double y1;
+        private double y2;
+        private double y3;
 
-        private double width;
-        private double height;
+        private const double epsilon = double.Epsilon * 100;
 
         public Triangle(double x1, double y1, double x2, double y2, double x3, double y3)
         {
+            this.x1 = x1;
+            this.x2 = x2;
+            this.x3 = x3;
+            this.y1 = y1;
+            this.y1 = y2;
+            this.y1 = y3;
+
             if (Math.Abs((x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1)) < epsilon)
             {
                 throw new ArgumentException("Все точки лежат на одной прямой");
             }
-
-            side1 = Math.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-            side2 = Math.Sqrt((x1 - x3) * (x1 - x3) + (y1 - y3) * (y1 - y3));
-            side3 = Math.Sqrt((x2 - x3) * (x2 - x3) + (y2 - y3) * (y2 - y3));
-
-            width = Math.Max(x1, Math.Max(x2, x3)) - Math.Min(x1, Math.Min(x2, x3));
-            height = Math.Max(y1, Math.Max(y2, y3)) - Math.Min(y1, Math.Min(y2, y3));
         }
 
-        private double epsilon = double.Epsilon * 100;
+        private double side1 => magnitude(x1, y1, x2, y2);
+        private double side2 => magnitude(x1, y1, x3, y3);
+        private double side3 => magnitude(x2, y2, x3, y3);
 
-        public double getArea()
+        private double magnitude(double x1, double y1, double x2, double y2)
         {
-            var p = getPerimeter() / 2;
+            return Math.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+        }
+
+        public double GetArea()
+        {
+            var p = GetPerimeter() / 2;
             return Math.Sqrt(p * (p - side1) * (p - side2) * (p - side3));
         }
 
-        public double getPerimeter()
+        public double GetPerimeter()
         {
             return side1 + side2 + side3;
         }
 
-        public double getWidth()
+        public double GetWidth()
         {
-            return width;
+            return Math.Max(x1, Math.Max(x2, x3)) - Math.Min(x1, Math.Min(x2, x3));
         }
 
-        public double getHeight()
+        public double GetHeight()
         {
-            return height;
+            return Math.Max(y1, Math.Max(y2, y3)) - Math.Min(y1, Math.Min(y2, y3));
         }
 
         public override bool Equals(object obj)
@@ -73,7 +82,7 @@ namespace Shapes
         public override int GetHashCode()
         {
             const int factor = 100;
-            return (int)Math.Truncate(getPerimeter() * factor);
+            return (int)Math.Truncate(GetPerimeter() * factor);
         }
 
         public override string ToString()
