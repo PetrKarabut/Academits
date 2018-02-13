@@ -71,5 +71,75 @@ namespace Matrixes
         {
             return "(" + string.Join(";", rows as object[]) + ")";
         }
+
+        public Vector GetVector(int index)
+        {
+            return new Vector(rows[index]);
+        }
+
+        public void SeTVector(int index, Vector vector)
+        {
+            rows[index] = new Vector(vector);
+        }
+
+        public Vector GetVectorColumn(int index)
+        {
+            var array = new double[height];
+
+            for (var i = 0; i < array.Length; i++)
+            {
+                array[i] = rows[i].GetComponent(index);
+            }
+
+            return new Vector(array);
+        }
+
+        public void Transpose()
+        {
+            var vectors = new Vector[width];
+
+            for (var i = 0; i < vectors.Length; i++)
+            {
+                vectors[i] = GetVectorColumn(i);
+            }
+
+            rows = vectors;
+        }
+
+        public void Multiply(double x)
+        {
+            foreach (var vector in rows)
+            {
+                vector.Multiply(x);
+            }
+        }
+
+        public Vector GetMultiplicationByColumn(Vector vector)
+        {
+            var array = new double[height];
+
+            for (var i = 0; i < array.Length; i++)
+            {
+                array[i] = Vector.Dot(vector, rows[i]);
+            }
+
+            return new Vector(array);
+        }
+
+        public Vector GetMultiplicationByRow(Vector vector)
+        {
+            var array = new double[width];
+
+            for (var i = 0; i < array.Length; i++)
+            {
+                for (var j = 0; j < height; j++)
+                {
+                    array[i] += vector.GetComponent(j) * rows[j].GetComponent(i);
+                }
+            }
+
+            return new Vector(array);
+        }
+       
     }
 }

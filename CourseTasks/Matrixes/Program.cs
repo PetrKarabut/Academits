@@ -42,7 +42,63 @@ namespace Matrixes
             matrix = new Matrix(new[] { vector1, vector2 });
             Console.WriteLine(matrix);
 
+            Console.ReadKey();
+            Console.Clear();
 
+            Console.WriteLine("Проверка вектор-стобцов и вектор-строк");
+            Console.WriteLine();
+            array = new[,] { { 1d, 2d, 4d, 1d }, { 2d, 3d, 0d, 9d }, { 0d, 1d, 7d, 6d }, { 2d, 5d, 7d, 8d }, { 6d, 8d, 5d, 1d } };
+            matrix = new Matrix(array);
+            Console.WriteLine("Задана матрица:");
+            WriteMatrix(matrix);
+
+            Console.WriteLine();
+            Console.WriteLine("Ширина: {0}, Высота {1}", matrix.width, matrix.height);
+            Console.WriteLine();
+
+            var newRow = new Vector(new[] { 9d, 8d, 0d, 4d });
+            Console.WriteLine("Вторая строка: {0}, заменим ее на {1}, получим:", matrix.GetVector(1), newRow);
+            matrix.SeTVector(1, newRow);
+            WriteMatrix(matrix);
+
+            Console.WriteLine();
+            Console.WriteLine("вот третий столбец: {0}", matrix.GetVectorColumn(2));
+
+            Console.ReadKey();
+            Console.Clear();
+
+            Console.WriteLine("Проверка транспонирования матрицы");
+            Console.WriteLine();
+            array = new[,] { { 2d, 6d, 4d, 0d }, { 9d, 7d, 0d, 7d }, { 0d, 6d, 8d, 8d }, { 1d, 1d, 7d, 3d }, { 3d, 8d, 3d, 1d } };
+            matrix = new Matrix(array);
+            Console.WriteLine("Задана матрица:");
+            WriteMatrix(matrix);
+            Console.WriteLine();
+            matrix.Transpose();
+            Console.WriteLine("Транспонированая матрица:");
+            WriteMatrix(matrix);
+
+            Console.ReadKey();
+            Console.Clear();
+
+            Console.WriteLine("Проверка умножения матрицы на число и вектор");
+            Console.WriteLine();
+            array = new[,] { { 2d, 3d, 2d, 0d }, { 4d, 3d, 0d, 2d }, { 0d, 1d, 1d, 4d }, { 1d, 2d, 2d, 3d } };
+            matrix = new Matrix(array);
+            Console.WriteLine("Задана матрица:");
+            WriteMatrix(matrix);
+            Console.WriteLine();
+
+            Console.WriteLine("Умножив на 2 получим:");
+            matrix.Multiply(2d);
+            WriteMatrix(matrix);
+            Console.WriteLine();
+
+            var vector = new Vector(new[] { 1d, 0d, 0d, 2d });
+            Console.WriteLine("Умножив справа на вектор-столбец {0} получим вектор-столбец {1}", vector, matrix.GetMultiplicationByColumn(vector));
+
+            vector = new Vector(new[] { 3d, 0d, 2d, 1d });
+            Console.WriteLine("Умножив слева на вектор-строку {0} получим вектор-строку {1}", vector, matrix.GetMultiplicationByRow(vector));
 
             Console.ReadKey();
         }
@@ -57,6 +113,14 @@ namespace Matrixes
                 }
 
                 Console.WriteLine();
+            }
+        }
+
+        private static void WriteMatrix(Matrix matrix)
+        {
+            for (var i = 0; i < matrix.height; i++)
+            {
+                Console.WriteLine(matrix.GetVector(i));
             }
         }
     }
