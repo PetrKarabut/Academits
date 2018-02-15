@@ -101,6 +101,36 @@ namespace Matrixes
             Console.WriteLine("Умножив слева на вектор-строку {0} получим вектор-строку {1}", vector, matrix.GetMultiplicationByRow(vector));
 
             Console.ReadKey();
+            Console.Clear();
+
+            Console.WriteLine("Проверка вычисления определителя");
+            Console.WriteLine();
+            Console.WriteLine("Задана матрица:");
+            array = new[,] { { -1d, 3d, 2d, -3d }, { 4d, -2d, 5d, 1d }, { -5d, 0d, -4d, 0d }, { 9d, 7d, 8d, -7d } };
+            matrix = new Matrix(array);
+            WriteMatrix(matrix);
+            Console.WriteLine();
+            Console.WriteLine("Ее определитель равен {0}", matrix.Determinant);
+
+            Console.ReadKey();
+            Console.Clear();
+
+            Console.WriteLine("Проверка умножения матриц");
+            Console.WriteLine();
+            Console.WriteLine("Задана матрица 1:");
+            var matrix1 = new Matrix(new[,] { { 1d, 3d, 0d }, { 2d, 0d, 1d }, { 0d, 0d, 1d } });
+            WriteMatrix(matrix1);
+
+            Console.WriteLine();
+            Console.WriteLine("Задана матрица 2:");
+            var matrix2 = new Matrix(new[,] { { 2d, 0d, 0d }, { 1d, 2d, 1d }, { 2d, 0d, 1d } });
+            WriteMatrix(matrix2);
+
+            Console.WriteLine();
+            Console.WriteLine("Результат умножения:");
+            WriteMatrix(Matrix.Multiplication(matrix1, matrix2));
+
+            Console.ReadKey();
         }
 
         private static void WriteMatrix(double[,] matrix)

@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 using Vectors;
 
 
-
-
-
 namespace Matrixes
 {
     class Matrix
     {
         private Vector[] rows;
+        
+        private int[] deletedRows;
+        private int[] deletedColumns;
+        private int remainingSize;
 
         public Matrix(int width, int height)
         {
@@ -51,7 +52,6 @@ namespace Matrixes
             }
         }
 
-                
         public int height => rows.Length;
         public int width => rows[0].Size;
 
@@ -140,6 +140,119 @@ namespace Matrixes
 
             return new Vector(array);
         }
-       
+
+        public double Determinant
+        {
+            get
+            {
+                if (height != width)
+                {
+                    throw new ArgumentException("Для вычисления определителя матрица должна быть квадратной.");
+                }
+
+                deletedRows = new int[height];
+                deletedColumns = new int[width];
+                remainingSize = height;
+                var factor = 1;
+                double determinant = 0;
+
+                for (var i = 0; i < width; i++)
+                {
+                    determinant += factor * rows[0].GetComponent(i) * GetMinor(0, i);
+                    factor *= -1;
+                }
+
+                return determinant;
+            }
+        }
+
+        private double GetMinor(int deletedRow, int deletedColumn)
+        {
+            deletedRows[deletedRow] = 1;
+            deletedColumns[deletedColumn] = 1;
+            remainingSize--;
+
+            if (remainingSize == 0)
+            {
+                deletedRows[deletedRow] = 0;
+                deletedColumns[deletedColumn] = 0;
+
+                remainingSize++;
+                return 1;
+            }
+
+            var upperRow = 0;
+
+            for (var i = 0; i < height; i++)
+            {
+                if (deletedRows[i] == 0)
+                {
+                    upperRow = i;
+                    break;
+                }
+            }
+
+            var factor = 1;
+            double minor = 0;
+
+            for (var i = 0; i < width; i++)
+            {
+                if (deletedColumns[i] == 1)
+                {
+                    continue;
+                }
+
+                minor += factor * rows[upperRow].GetComponent(i) * GetMinor(upperRow, i);
+                factor *= -1;
+            }
+
+            deletedRows[deletedRow] = 0;
+            deletedColumns[deletedColumn] = 0;
+
+            remainingSize++;
+
+            return minor;
+        }
+
+        public void Plus(Matrix other)
+        {
+            for (var i = 0; i < height; i++)
+            {
+                rows[i].Plus(other.rows[i]);
+            }
+        }
+
+        public void Minus(Matrix other)
+        {
+            for (var i = 0; i < height; i++)
+            {
+                rows[i].Minus(other.rows[i]);
+            }
+        }
+
+        public static Matrix Sum(Matrix matrix1, Matrix matrix2)
+        {
+            var matrix = new Matrix(matrix1);
+            matrix.Plus(matrix2);
+            return matrix;
+        }
+
+        public static Matrix Difference(Matrix matrix1, Matrix matrix2)
+        {
+            var matrix = new Matrix(matrix1);
+            matrix.Minus(matrix2);
+            return matrix;
+        }
+
+        public static Matrix Multiplication(Matrix matrix1, Matrix matrix2)
+        {
+            var matrix = new Matrix(matrix1.width, matrix1.height);
+            for (var i = 0; i < matrix1.height; i++)
+            {
+               matrix.rows[i] = matrix2.GetMultiplicationByRow(matrix1.rows[i]);
+            }
+
+            return matrix;
+        }
     }
 }
