@@ -32,11 +32,11 @@ namespace Shapes
             }
         }
 
-        private double side1 => magnitude(x1, y1, x2, y2);
-        private double side2 => magnitude(x1, y1, x3, y3);
-        private double side3 => magnitude(x2, y2, x3, y3);
+        private double Side1 => Magnitude(x1, y1, x2, y2);
+        private double Side2 => Magnitude(x1, y1, x3, y3);
+        private double Side3 => Magnitude(x2, y2, x3, y3);
 
-        private double magnitude(double x1, double y1, double x2, double y2)
+        private double Magnitude(double x1, double y1, double x2, double y2)
         {
             return Math.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
         }
@@ -44,12 +44,12 @@ namespace Shapes
         public double GetArea()
         {
             var p = GetPerimeter() / 2;
-            return Math.Sqrt(p * (p - side1) * (p - side2) * (p - side3));
+            return Math.Sqrt(p * (p - Side1) * (p - Side2) * (p - Side3));
         }
 
         public double GetPerimeter()
         {
-            return side1 + side2 + side3;
+            return Side1 + Side2 + Side3;
         }
 
         public double GetWidth()
@@ -76,7 +76,7 @@ namespace Shapes
 
             var other = (Triangle)obj;
 
-            return side1 == other.side1 && side2 == other.side2 && side3 == other.side3;
+            return Side1 == other.Side1 && Side2 == other.Side2 && Side3 == other.Side3;
         }
 
         public override int GetHashCode()
@@ -87,7 +87,7 @@ namespace Shapes
 
         public override string ToString()
         {
-            return $"Треугольник, стороны: {side1}, {side2}, {side3}";
+            return $"Треугольник, стороны: {Side1}, {Side2}, {Side3}";
         }
     }
 }
