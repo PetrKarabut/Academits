@@ -11,13 +11,18 @@ namespace Matrixes
     class Matrix
     {
         private Vector[] rows;
-        
+
         private int[] deletedRows;
         private int[] deletedColumns;
         private int remainingSize;
 
         public Matrix(int width, int height)
         {
+            if (height <= 0 || width <= 0)
+            {
+                throw new ArgumentException("размеры матрицы должны быть больше нуля");
+            }
+
             rows = new Vector[height];
             for (var i = 0; i < height; i++)
             {
@@ -27,8 +32,8 @@ namespace Matrixes
 
         public Matrix(Matrix other)
         {
-            rows = new Vector[other.height];
-            for (var i = 0; i < height; i++)
+            rows = new Vector[other.Height];
+            for (var i = 0; i < Height; i++)
             {
                 rows[i] = new Vector(other.rows[i]);
             }
@@ -36,15 +41,54 @@ namespace Matrixes
 
         public Matrix(double[,] array)
         {
+            if (array.GetLength(0) == 0)
+            {
+                throw new ArgumentException("размеры матрицы должны быть больше нуля");
+            }
+
             rows = new Vector[array.GetLength(0)];
             for (var i = 0; i < rows.Length; i++)
             {
-                rows[i] = new Vector(GetRow(array, i));
+                var arrayRow = new double[array.GetLength(1)];
+
+                for (var j = 0; j < arrayRow.Length; j++)
+                {
+                    arrayRow[j] = array[i, j];
+                }
+
+                rows[i] = new Vector(arrayRow);
             }
         }
 
         public Matrix(Vector[] vectors)
         {
+            if (vectors.Length == 0)
+            {
+                throw new ArgumentException("размеры матрицы должны быть больше нуля");
+            }
+
+            var maximumLength = vectors[0].Size;
+
+            bool sizesDifferent = false;
+
+            foreach (var v in vectors)
+            {
+                if (v.Size != maximumLength)
+                {
+                    sizesDifferent = true;
+                }
+                maximumLength = Math.Max(v.Size, maximumLength);
+            }
+
+            if (sizesDifferent)
+            {
+                var zero = new Vector(maximumLength);
+                foreach (var v in vectors)
+                {
+                    v.Plus(zero);
+                }
+            }
+
             rows = new Vector[vectors.Length];
             for (var i = 0; i < rows.Length; i++)
             {
@@ -52,39 +96,32 @@ namespace Matrixes
             }
         }
 
-        public int height => rows.Length;
-        public int width => rows[0].Size;
-
-        public static double[] GetRow(double[,] array, int n)
-        {
-            var arrayRow = new double[array.GetLength(1)];
-
-            for (var i = 0; i < arrayRow.Length; i++)
-            {
-                arrayRow[i] = array[n, i];
-            }
-
-            return arrayRow;
-        }
+        public int Height => rows.Length;
+        public int Width => rows[0].Size;
 
         public override string ToString()
         {
             return "(" + string.Join(";", rows as object[]) + ")";
         }
 
-        public Vector GetVector(int index)
+        public Vector GetRow(int index)
         {
             return new Vector(rows[index]);
         }
 
-        public void SeTVector(int index, Vector vector)
+        public void SetRow(int index, Vector vector)
         {
+            if (Height > 1 && vector.Size != Width)
+            {
+                throw new ArgumentException("неправильный размер вектора");
+            }
+
             rows[index] = new Vector(vector);
         }
 
-        public Vector GetVectorColumn(int index)
+        public Vector GetColumn(int index)
         {
-            var array = new double[height];
+            var array = new double[Height];
 
             for (var i = 0; i < array.Length; i++)
             {
@@ -96,11 +133,11 @@ namespace Matrixes
 
         public void Transpose()
         {
-            var vectors = new Vector[width];
+            var vectors = new Vector[Width];
 
             for (var i = 0; i < vectors.Length; i++)
             {
-                vectors[i] = GetVectorColumn(i);
+                vectors[i] = GetColumn(i);
             }
 
             rows = vectors;
@@ -116,7 +153,12 @@ namespace Matrixes
 
         public Vector GetMultiplicationByColumn(Vector vector)
         {
-            var array = new double[height];
+            if (vector.Size != Width)
+            {
+                throw new ArgumentException("неправильный размер вектора");
+            }
+
+            var array = new double[Height];
 
             for (var i = 0; i < array.Length; i++)
             {
@@ -128,11 +170,16 @@ namespace Matrixes
 
         public Vector GetMultiplicationByRow(Vector vector)
         {
-            var array = new double[width];
+            if (vector.Size != Height)
+            {
+                throw new ArgumentException("неправильный размер вектора");
+            }
+
+            var array = new double[Width];
 
             for (var i = 0; i < array.Length; i++)
             {
-                for (var j = 0; j < height; j++)
+                for (var j = 0; j < Height; j++)
                 {
                     array[i] += vector.GetComponent(j) * rows[j].GetComponent(i);
                 }
@@ -141,29 +188,26 @@ namespace Matrixes
             return new Vector(array);
         }
 
-        public double Determinant
+        public double GetDeterminant()
         {
-            get
+            if (Height != Width)
             {
-                if (height != width)
-                {
-                    throw new ArgumentException("Для вычисления определителя матрица должна быть квадратной.");
-                }
-
-                deletedRows = new int[height];
-                deletedColumns = new int[width];
-                remainingSize = height;
-                var factor = 1;
-                double determinant = 0;
-
-                for (var i = 0; i < width; i++)
-                {
-                    determinant += factor * rows[0].GetComponent(i) * GetMinor(0, i);
-                    factor *= -1;
-                }
-
-                return determinant;
+                throw new ArgumentException("Для вычисления определителя матрица должна быть квадратной.");
             }
+
+            deletedRows = new int[Height];
+            deletedColumns = new int[Width];
+            remainingSize = Height;
+            var factor = 1;
+            double determinant = 0;
+
+            for (var i = 0; i < Width; i++)
+            {
+                determinant += factor * rows[0].GetComponent(i) * GetMinor(0, i);
+                factor *= -1;
+            }
+
+            return determinant;
         }
 
         private double GetMinor(int deletedRow, int deletedColumn)
@@ -183,7 +227,7 @@ namespace Matrixes
 
             var upperRow = 0;
 
-            for (var i = 0; i < height; i++)
+            for (var i = 0; i < Height; i++)
             {
                 if (deletedRows[i] == 0)
                 {
@@ -195,7 +239,7 @@ namespace Matrixes
             var factor = 1;
             double minor = 0;
 
-            for (var i = 0; i < width; i++)
+            for (var i = 0; i < Width; i++)
             {
                 if (deletedColumns[i] == 1)
                 {
@@ -216,7 +260,12 @@ namespace Matrixes
 
         public void Plus(Matrix other)
         {
-            for (var i = 0; i < height; i++)
+            if (Height != other.Height || Width != other.Width)
+            {
+                throw new ArgumentException("размеры матриц должны совпадать");
+            }
+
+            for (var i = 0; i < Height; i++)
             {
                 rows[i].Plus(other.rows[i]);
             }
@@ -224,7 +273,12 @@ namespace Matrixes
 
         public void Minus(Matrix other)
         {
-            for (var i = 0; i < height; i++)
+            if (Height != other.Height || Width != other.Width)
+            {
+                throw new ArgumentException("размеры матриц должны совпадать");
+            }
+
+            for (var i = 0; i < Height; i++)
             {
                 rows[i].Minus(other.rows[i]);
             }
@@ -246,10 +300,18 @@ namespace Matrixes
 
         public static Matrix Multiplication(Matrix matrix1, Matrix matrix2)
         {
-            var matrix = new Matrix(matrix1.width, matrix1.height);
-            for (var i = 0; i < matrix1.height; i++)
+
+            var matrix = new Matrix(matrix1.Width, matrix1.Height);
+            for (var i = 0; i < matrix1.Height; i++)
             {
-               matrix.rows[i] = matrix2.GetMultiplicationByRow(matrix1.rows[i]);
+                try
+                {
+                    matrix.rows[i] = matrix2.GetMultiplicationByRow(matrix1.rows[i]);
+                }
+                catch (ArgumentException)
+                {
+                    throw new ArgumentException("неправильные размеры перемножаемых матриц");
+                }
             }
 
             return matrix;

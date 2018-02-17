@@ -36,7 +36,7 @@ namespace Matrixes
             Console.WriteLine();
 
             var vector1 = new Vector(new[] { 3d, 5d, 8d });
-            var vector2 = new Vector(new[] { 2d, 1d, 6d });
+            var vector2 = new Vector(new[] { 2d, 1d, 6d, 8d });
             Console.WriteLine("Даны два вектора {0} и {1}", vector1, vector2);
             Console.WriteLine("Из них получается матрица:");
             matrix = new Matrix(new[] { vector1, vector2 });
@@ -53,16 +53,16 @@ namespace Matrixes
             WriteMatrix(matrix);
 
             Console.WriteLine();
-            Console.WriteLine("Ширина: {0}, Высота {1}", matrix.width, matrix.height);
+            Console.WriteLine("Ширина: {0}, Высота {1}", matrix.Width, matrix.Height);
             Console.WriteLine();
 
             var newRow = new Vector(new[] { 9d, 8d, 0d, 4d });
-            Console.WriteLine("Вторая строка: {0}, заменим ее на {1}, получим:", matrix.GetVector(1), newRow);
-            matrix.SeTVector(1, newRow);
+            Console.WriteLine("Вторая строка: {0}, заменим ее на {1}, получим:", matrix.GetRow(1), newRow);
+            matrix.SetRow(1, newRow);
             WriteMatrix(matrix);
 
             Console.WriteLine();
-            Console.WriteLine("вот третий столбец: {0}", matrix.GetVectorColumn(2));
+            Console.WriteLine("вот третий столбец: {0}", matrix.GetColumn(2));
 
             Console.ReadKey();
             Console.Clear();
@@ -110,7 +110,7 @@ namespace Matrixes
             matrix = new Matrix(array);
             WriteMatrix(matrix);
             Console.WriteLine();
-            Console.WriteLine("Ее определитель равен {0}", matrix.Determinant);
+            Console.WriteLine("Ее определитель равен {0}", matrix.GetDeterminant());
 
             Console.ReadKey();
             Console.Clear();
@@ -148,9 +148,9 @@ namespace Matrixes
 
         private static void WriteMatrix(Matrix matrix)
         {
-            for (var i = 0; i < matrix.height; i++)
+            for (var i = 0; i < matrix.Height; i++)
             {
-                Console.WriteLine(matrix.GetVector(i));
+                Console.WriteLine(matrix.GetRow(i));
             }
         }
     }
