@@ -69,30 +69,16 @@ namespace Matrixes
 
             var maximumLength = vectors[0].Size;
 
-            bool sizesDifferent = false;
-
             foreach (var v in vectors)
             {
-                if (v.Size != maximumLength)
-                {
-                    sizesDifferent = true;
-                }
                 maximumLength = Math.Max(v.Size, maximumLength);
             }
-
-            if (sizesDifferent)
-            {
-                var zero = new Vector(maximumLength);
-                foreach (var v in vectors)
-                {
-                    v.Plus(zero);
-                }
-            }
+            var zero = new Vector(maximumLength);
 
             rows = new Vector[vectors.Length];
             for (var i = 0; i < rows.Length; i++)
             {
-                rows[i] = new Vector(vectors[i]);
+                rows[i] = Vector.Sum(zero, vectors[i]);
             }
         }
 
@@ -106,12 +92,22 @@ namespace Matrixes
 
         public Vector GetRow(int index)
         {
+            if (index < 0 || index > Height - 1)
+            {
+                throw new IndexOutOfRangeException("матрица не содержит строки с таким индексом");
+            }
+
             return new Vector(rows[index]);
         }
 
         public void SetRow(int index, Vector vector)
         {
-            if (Height > 1 && vector.Size != Width)
+            if (index < 0 || index > Height - 1)
+            {
+                throw new IndexOutOfRangeException("матрица не содержит строки с таким индексом");
+            }
+
+            if (vector.Size != Width)
             {
                 throw new ArgumentException("неправильный размер вектора");
             }
@@ -121,6 +117,11 @@ namespace Matrixes
 
         public Vector GetColumn(int index)
         {
+            if (index < 0 || index > Width - 1)
+            {
+                throw new IndexOutOfRangeException("матрица не содержит столбца с таким индексом");
+            }
+
             var array = new double[Height];
 
             for (var i = 0; i < array.Length; i++)
@@ -286,6 +287,11 @@ namespace Matrixes
 
         public static Matrix Sum(Matrix matrix1, Matrix matrix2)
         {
+            if (matrix1.Height != matrix2.Height || matrix1.Width != matrix2.Width)
+            {
+                throw new ArgumentException("размеры матриц должны совпадать");
+            }
+
             var matrix = new Matrix(matrix1);
             matrix.Plus(matrix2);
             return matrix;
@@ -293,6 +299,11 @@ namespace Matrixes
 
         public static Matrix Difference(Matrix matrix1, Matrix matrix2)
         {
+            if (matrix1.Height != matrix2.Height || matrix1.Width != matrix2.Width)
+            {
+                throw new ArgumentException("размеры матриц должны совпадать");
+            }
+
             var matrix = new Matrix(matrix1);
             matrix.Minus(matrix2);
             return matrix;
@@ -300,18 +311,17 @@ namespace Matrixes
 
         public static Matrix Multiplication(Matrix matrix1, Matrix matrix2)
         {
+            if (matrix1.Width != matrix2.Height)
+            {
+                throw new ArgumentException("неправильные размеры: ширина первой матрицы должна совпадать с высотой второй матрицы");
+            }
 
-            var matrix = new Matrix(matrix1.Width, matrix1.Height);
+            // умножение матрицы размером M x N (M - высота, N - ширина) и матрицы N x K дает матрицу размером M x K
+            // определение умножения взято отсюда  ru.onlinemschool.com/math/library/matrix/multiply/
+            var matrix = new Matrix(matrix2.Width, matrix1.Height);
             for (var i = 0; i < matrix1.Height; i++)
             {
-                try
-                {
-                    matrix.rows[i] = matrix2.GetMultiplicationByRow(matrix1.rows[i]);
-                }
-                catch (ArgumentException)
-                {
-                    throw new ArgumentException("неправильные размеры перемножаемых матриц");
-                }
+                matrix.rows[i] = matrix2.GetMultiplicationByRow(matrix1.rows[i]);
             }
 
             return matrix;
