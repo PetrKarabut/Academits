@@ -108,14 +108,6 @@ namespace Lists
 
             var previous = GetUnit(index - 1);
 
-            if (index == Count - 1)
-            {
-                var value = previous.Next.Value;
-                previous.Next = null;
-                Count--;
-                return value;
-            }
-
             var deletedValue = previous.Next.Value;
             previous.Next = previous.Next.Next;
             Count--;
@@ -162,7 +154,7 @@ namespace Lists
                 return false;
             }
 
-            if (AreEqual(head.Value, value))
+            if (Equals(head.Value, value))
             {
                 head = head.Next;
                 Count--;
@@ -172,7 +164,7 @@ namespace Lists
             var previous = head;
             for (var i = 0; i < Count - 1; i++)
             {
-                if (AreEqual(previous.Next.Value,value))
+                if (Equals(previous.Next.Value,value))
                 {
                     previous.Next = previous.Next.Next;
                     Count--;
@@ -182,21 +174,6 @@ namespace Lists
             }
 
             return false;
-        }
-
-        private bool AreEqual(T t1, T t2)
-        {
-            if (t1 == null)
-            {
-                return (t2 == null);
-            }
-
-            if (t2 == null)
-            {
-                return false;
-            }
-
-            return t1.Equals(t2);
         }
 
         public T DeleteFirst()
@@ -240,12 +217,10 @@ namespace Lists
             var unit = head;
             var copyUnit = new Unit(unit.Value);
             copy.head = copyUnit;
-            copy.Count = 1;
+            copy.Count = Count;
             for (var i = 0; i < Count - 1; i++)
             {
                 copyUnit.Next = new Unit(unit.Next.Value);
-                copy.Count++;
-
                 unit = unit.Next;
                 copyUnit = copyUnit.Next;
             }
