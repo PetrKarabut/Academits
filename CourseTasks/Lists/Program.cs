@@ -57,6 +57,9 @@ namespace Lists
             Console.WriteLine("после разворота списка получим");
             list.Reverse();
             Console.WriteLine(list);
+            Console.WriteLine();
+            Console.WriteLine("после копирования списка получим");
+            Console.WriteLine(list.Clone());
 
             Console.ReadKey();
         }

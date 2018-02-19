@@ -18,6 +18,7 @@ namespace Lists
             {
                 Value = value;
             }
+            
         }
 
         private Unit head;
@@ -37,76 +38,75 @@ namespace Lists
             }
         }
 
-        public T GetValue(int index)
+        private Unit GetUnit(int index)
         {
-            if (head == null || index < 0 || index >= Count)
-            {
-                throw new IndexOutOfRangeException();
-            }
-
             var unit = head;
 
             for (var i = 0; i < Count; i++)
             {
                 if (i == index)
                 {
-                    return unit.Value;
+                    return unit;
                 }
 
                 unit = unit.Next;
             }
 
-            return unit.Value;
+            return null;
+        }
+
+        public T GetValue(int index)
+        {
+            if (index < 0 || index >= Count)
+            {
+                throw new IndexOutOfRangeException("Ошибка при получении значения по индексу: индекс вышел за пределы списка");
+            }
+
+            if (head == null)
+            {
+                throw new NullReferenceException("Ошибка при получении значения по индексу: список пуст");
+            }
+
+            return GetUnit(index).Value;
+           
         }
 
         public T SetValue(int index, T value)
         {
-            if (head == null || index < 0 || index >= Count)
+            if (index < 0 || index >= Count)
             {
-                throw new IndexOutOfRangeException();
+                throw new IndexOutOfRangeException("Ошибка при задании значения по индексу: индекс вышел за пределы списка");
             }
 
-            var unit = head;
-            T old;
-            for (var i = 0; i < Count; i++)
+            if (head == null)
             {
-                if (i == index)
-                {
-                    old = unit.Value;
-                    unit.Value = value;
-                    return old;
-                }
-
-                unit = unit.Next;
+                throw new NullReferenceException("Ошибка при задании значения по индексу: список пуст");
             }
 
-            return unit.Value;
+            var unit = GetUnit(index);
+            var old = unit.Value;
+            unit.Value = value;
+            return old;
         }
 
         public T RemoveAt(int index)
         {
-            if (head == null || index < 0 || index >= Count)
+            if (index < 0 || index >= Count)
             {
-                throw new IndexOutOfRangeException();
+                throw new IndexOutOfRangeException("Ошибка при удалении значения по индексу: индекс вышел за пределы списка");
+            }
+
+            if (head == null)
+            {
+                throw new NullReferenceException("Ошибка при удалении значения по индексу: список пуст");
             }
 
             if (index == 0)
             {
-                var value = head.Value;
-                head = null;
-                Count--;
-                return value;
+                return DeleteFirst();
             }
 
-            var previous = head;
-            for (var i = 0; i < Count; i++)
-            {
-                if (i == index - 1)
-                {
-                    break;
-                }
-                previous = previous.Next;
-            }
+            var previous = GetUnit(index - 1);
 
             if (index == Count - 1)
             {
@@ -125,7 +125,7 @@ namespace Lists
         public void InsertInBegining(T value)
         {
             var unit = new Unit(value);
-            if (Count > 1)
+            if (Count > 0)
             {
                 unit.Next = head;
             }
@@ -142,20 +142,12 @@ namespace Lists
                 return;
             }
 
-            if (head == null || index < 0 || index > Count)
+            if (index < 0 || index > Count)
             {
-                throw new IndexOutOfRangeException();
+                throw new IndexOutOfRangeException("Ошибка при вставке значения по индексу: индекс вышел за пределы списка");
             }
 
-            var previous = head;
-            for (var i = 0; i < Count; i++)
-            {
-                if (i == index - 1)
-                {
-                    break;
-                }
-                previous = previous.Next;
-            }
+            var previous = GetUnit(index - 1);
 
             var unit = new Unit(value);
             unit.Next = previous.Next;
@@ -170,7 +162,7 @@ namespace Lists
                 return false;
             }
 
-            if (head.Value.Equals(value))
+            if (AreEqual(head.Value, value))
             {
                 head = head.Next;
                 Count--;
@@ -180,7 +172,7 @@ namespace Lists
             var previous = head;
             for (var i = 0; i < Count - 1; i++)
             {
-                if (previous.Next.Value.Equals(value))
+                if (AreEqual(previous.Next.Value,value))
                 {
                     previous.Next = previous.Next.Next;
                     Count--;
@@ -192,11 +184,26 @@ namespace Lists
             return false;
         }
 
+        private bool AreEqual(T t1, T t2)
+        {
+            if (t1 == null)
+            {
+                return (t2 == null);
+            }
+
+            if (t2 == null)
+            {
+                return false;
+            }
+
+            return t1.Equals(t2);
+        }
+
         public T DeleteFirst()
         {
             if (head == null)
             {
-                throw new NullReferenceException();
+                throw new NullReferenceException("Ошибка при удалении первого элемента: список пуст");
             }
             var value = head.Value;
             head = head.Next;
@@ -219,6 +226,31 @@ namespace Lists
                 next1.Next = head;
                 head = next1;
             }
+        }
+
+        public SimplyConnectedList<T> Clone()
+        {
+            var copy = new SimplyConnectedList<T>();
+
+            if (head == null)
+            {
+                return copy;
+            }
+
+            var unit = head;
+            var copyUnit = new Unit(unit.Value);
+            copy.head = copyUnit;
+            copy.Count = 1;
+            for (var i = 0; i < Count - 1; i++)
+            {
+                copyUnit.Next = new Unit(unit.Next.Value);
+                copy.Count++;
+
+                unit = unit.Next;
+                copyUnit = copyUnit.Next;
+            }
+
+            return copy;
         }
 
         public override string ToString()
