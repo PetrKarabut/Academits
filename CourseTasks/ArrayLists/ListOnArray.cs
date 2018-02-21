@@ -11,11 +11,17 @@ namespace ArrayLists
     {
         private T[] array;
 
-        private int capacity;
+        private int runningEnumerators;
 
+        private const int defaultCapacity = 40;
+
+        public ListOnArray()
+        {
+            array = new T[defaultCapacity];
+        }
+        
         public ListOnArray(int capacity)
         {
-            this.capacity = capacity;
             array = new T[capacity];
         }
         
@@ -42,18 +48,34 @@ namespace ArrayLists
                     throw new IndexOutOfRangeException("Ошибка: индекс вышел за пределы списка");
                 }
 
+                OnChange();
                 array[index] = value;
+            }
+        }
+
+        private void OnChange()
+        {
+            if (runningEnumerators > 0)
+            {
+                throw new Exception("Ошибка: нельзя изменять коллекцию во время работы перечислителя");
             }
         }
 
         public IEnumerator<T> GetEnumerator()
         {
-            return new ListEnumerator<T>(array, Count);
+            runningEnumerators++;
+
+            for (var i = 0; i < Count; i++)
+            {
+                yield return array[i];
+            }
+
+            runningEnumerators--;
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return new ListEnumerator<T>(array, Count);
+            return GetEnumerator();
         }
 
         public int IndexOf(T item)
@@ -71,9 +93,17 @@ namespace ArrayLists
 
         public void Insert(int index, T item)
         {
-            if (index < 0 || index >= Count)
+            if (index < 0 || index > Count)
             {
                 throw new IndexOutOfRangeException("Ошибка: индекс вышел за пределы списка");
+            }
+
+            OnChange();
+
+            if (index == Count)
+            {
+                Add(item);
+                return;
             }
 
             if (Count == array.Length)
@@ -81,10 +111,7 @@ namespace ArrayLists
                 IncreaseCapacity();
             }
 
-            for (var i = Count; i > index; i--)
-            {
-                array[i] = array[i - 1];
-            }
+            Array.Copy(array, index, array, index + 1, Count - index);
 
             array[index] = item;
             Count++;
@@ -97,16 +124,17 @@ namespace ArrayLists
                 throw new IndexOutOfRangeException("Ошибка: индекс вышел за пределы списка");
             }
 
-            for (var i = index; i < Count - 1; i++)
-            {
-                array[i] = array[i + 1];
-            }
+            OnChange();
+
+            Array.Copy(array, index + 1, array, index, Count - index - 1);
 
             Count--;
         }
 
         public void Add(T item)
         {
+            OnChange();
+
             if (Count == array.Length)
             {
                 IncreaseCapacity();
@@ -125,7 +153,7 @@ namespace ArrayLists
         {
             get
             {
-                return capacity;
+                return array.Length;
             }
 
             set
@@ -135,15 +163,16 @@ namespace ArrayLists
                     throw new ArgumentException("нельзя задать вместимость меньше длины списка");
                 }
 
+                OnChange();
                 var old = array;
                 array = new T[value];
                 Array.Copy(old, array, Count);
-                capacity = value;
             }
         }
 
         public void Clear()
         {
+            OnChange();
             Count = 0;
         }
 
@@ -154,7 +183,7 @@ namespace ArrayLists
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            if (arrayIndex < 0 || arrayIndex > array.Length)
+            if (arrayIndex < 0 || arrayIndex >= array.Length)
             {
                 throw new IndexOutOfRangeException("Ошибка: индекс вышел за пределы массива");
             }
@@ -177,6 +206,7 @@ namespace ArrayLists
                 return false;
             }
 
+            OnChange();
             RemoveAt(index);
             return true;
         }
@@ -188,10 +218,10 @@ namespace ArrayLists
                 return;
             }
 
+            OnChange();
             var old = array;
             array = new T[Count];
             Array.Copy(old, array, Count);
-            capacity = Count;
         }
     }
 }

@@ -19,7 +19,7 @@ namespace ArrayLists
             list.Add("A");
             list.Add("D");
             list.Add("F");
-           
+
             WriteList(list, "задан список");
 
             list.TrimExcess();
@@ -53,7 +53,6 @@ namespace ArrayLists
             WriteList(list, "после очищения списка");
 
 
-
             Console.ReadKey();
         }
 
@@ -64,6 +63,6 @@ namespace ArrayLists
             Console.WriteLine();
         }
 
-      
+
     }
 }
