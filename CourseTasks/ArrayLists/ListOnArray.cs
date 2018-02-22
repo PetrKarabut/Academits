@@ -11,7 +11,7 @@ namespace ArrayLists
     {
         private T[] array;
 
-        private int runningEnumerators;
+        private int changesCount;
 
         private const int defaultCapacity = 40;
 
@@ -55,22 +55,23 @@ namespace ArrayLists
 
         private void OnChange()
         {
-            if (runningEnumerators > 0)
-            {
-                throw new Exception("Ошибка: нельзя изменять коллекцию во время работы перечислителя");
-            }
+            changesCount++;
         }
 
         public IEnumerator<T> GetEnumerator()
         {
-            runningEnumerators++;
+            var changes = changesCount;
 
             for (var i = 0; i < Count; i++)
             {
                 yield return array[i];
+               if (changes != changesCount)
+                {
+                    throw new Exception("Ошибка: коллекция не должна меняться во время работы перечислителя");
+                }
             }
 
-            runningEnumerators--;
+           
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -163,7 +164,6 @@ namespace ArrayLists
                     throw new ArgumentException("нельзя задать вместимость меньше длины списка");
                 }
 
-                OnChange();
                 var old = array;
                 array = new T[value];
                 Array.Copy(old, array, Count);
@@ -218,7 +218,6 @@ namespace ArrayLists
                 return;
             }
 
-            OnChange();
             var old = array;
             array = new T[Count];
             Array.Copy(old, array, Count);

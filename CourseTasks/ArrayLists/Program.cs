@@ -53,6 +53,8 @@ namespace ArrayLists
             WriteList(list, "после очищения списка");
 
 
+
+
             Console.ReadKey();
         }
 
