@@ -18,12 +18,14 @@ namespace HashTables
             hashTable.Add("A");
             hashTable.Add("D");
             hashTable.Add("F");
+            hashTable.Add(null);
 
             WriteTable(hashTable);
             Console.WriteLine();
 
 
             hashTable.Remove("D");
+            hashTable.Remove(null);
             WriteTable(hashTable);
 
             Console.ReadKey();
@@ -33,7 +35,7 @@ namespace HashTables
         {
             foreach (var s in table)
             {
-                Console.Write(s + " ");
+                Console.Write((s != null ? s : "null") + " ");
             }
         }
     }

@@ -11,13 +11,13 @@ namespace HashTables
     {
         private List<T>[] array;
 
-        private int changesCount = 0;
+        private int changesCount;
 
-        private const int defaultSize = 20;
+        private const int DefaultSize = 20;
 
         public HashTable()
         {
-            array = new List<T>[defaultSize];
+            array = new List<T>[DefaultSize];
         }
 
         public HashTable(int size)
@@ -25,23 +25,7 @@ namespace HashTables
             array = new List<T>[size];
         }
 
-        public int Count
-        {
-            get
-            {
-                var count = 0;
-                foreach (var list in array)
-                {
-                    if (list != null)
-                    {
-                        count += list.Count;
-                    }
-                }
-
-                return count;
-            }
-        }
-
+        public int Count { get; private set; }
 
         public bool IsReadOnly => false;
 
@@ -52,6 +36,11 @@ namespace HashTables
 
         private int GetIndex(object o)
         {
+            if (o == null)
+            {
+                return 0;
+            }
+
             return GetIndex(o.GetHashCode());
         }
 
@@ -70,6 +59,7 @@ namespace HashTables
             }
 
             OnChange();
+            Count++;
             array[index].Add(item);
 
         }
@@ -82,6 +72,7 @@ namespace HashTables
             }
 
             OnChange();
+            Count = 0;
 
             for (var i = 0; i < array.Length; i++)
             {
@@ -92,7 +83,7 @@ namespace HashTables
         public bool Contains(T item)
         {
             var index = GetIndex(item);
-            return array[index] == null ? false : array[index].Contains(item);
+            return array[index] != null && array[index].Contains(item);
         }
 
         public void CopyTo(T[] array, int arrayIndex)
@@ -104,18 +95,10 @@ namespace HashTables
 
             var index = arrayIndex;
 
-            foreach (var list in this.array)
+            foreach (var item in this)
             {
-                if (list == null)
-                {
-                    continue;
-                }
-
-                foreach (var item in list)
-                {
-                    array[index] = item;
-                    index++;
-                }
+                array[index] = item;
+                index++;
             }
         }
 
@@ -155,6 +138,7 @@ namespace HashTables
             if (removed)
             {
                 OnChange();
+                Count--;
                 return true;
             }
             else
