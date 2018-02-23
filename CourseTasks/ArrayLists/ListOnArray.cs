@@ -19,12 +19,12 @@ namespace ArrayLists
         {
             array = new T[defaultCapacity];
         }
-        
+
         public ListOnArray(int capacity)
         {
             array = new T[capacity];
         }
-        
+
         public int Count { get; private set; }
 
         public bool IsReadOnly => false;
@@ -48,7 +48,6 @@ namespace ArrayLists
                     throw new IndexOutOfRangeException("Ошибка: индекс вышел за пределы списка");
                 }
 
-                OnChange();
                 array[index] = value;
             }
         }
@@ -65,13 +64,11 @@ namespace ArrayLists
             for (var i = 0; i < Count; i++)
             {
                 yield return array[i];
-               if (changes != changesCount)
+                if (changes != changesCount)
                 {
-                    throw new Exception("Ошибка: коллекция не должна меняться во время работы перечислителя");
+                    throw new InvalidOperationException("Ошибка: коллекция не должна меняться во время работы перечислителя");
                 }
             }
-
-           
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -172,7 +169,11 @@ namespace ArrayLists
 
         public void Clear()
         {
-            OnChange();
+            if (Count > 0)
+            {
+                OnChange();
+            }
+
             Count = 0;
         }
 

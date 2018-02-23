@@ -10,6 +10,31 @@ namespace HashTables
     {
         static void Main(string[] args)
         {
+            var hashTable = new HashTable<string>(20);
+
+            hashTable.Add("A");
+            hashTable.Add("B");
+            hashTable.Add("C");
+            hashTable.Add("A");
+            hashTable.Add("D");
+            hashTable.Add("F");
+
+            WriteTable(hashTable);
+            Console.WriteLine();
+
+
+            hashTable.Remove("D");
+            WriteTable(hashTable);
+
+            Console.ReadKey();
+        }
+
+        private static void WriteTable(HashTable<string> table)
+        {
+            foreach (var s in table)
+            {
+                Console.Write(s + " ");
+            }
         }
     }
 }

@@ -11,51 +11,162 @@ namespace HashTables
     {
         private List<T>[] array;
 
-        
+        private int changesCount = 0;
 
-        public int Count { get; private set; }
-       
+        private const int defaultSize = 20;
+
+        public HashTable()
+        {
+            array = new List<T>[defaultSize];
+        }
+
+        public HashTable(int size)
+        {
+            array = new List<T>[size];
+        }
+
+        public int Count
+        {
+            get
+            {
+                var count = 0;
+                foreach (var list in array)
+                {
+                    if (list != null)
+                    {
+                        count += list.Count;
+                    }
+                }
+
+                return count;
+            }
+        }
+
 
         public bool IsReadOnly => false;
 
-        private int GetIndex(int hashCode, int length)
+        private void OnChange()
         {
-            return Math.Abs(hashCode % length);
+            changesCount++;
+        }
+
+        private int GetIndex(object o)
+        {
+            return GetIndex(o.GetHashCode());
+        }
+
+        private int GetIndex(int hashCode)
+        {
+            return Math.Abs(hashCode % array.Length);
         }
 
         public void Add(T item)
         {
-            var index = GetIndex(item.GetHashCode(), array.Length);
+            var index = GetIndex(item);
+
+            if (array[index] == null)
+            {
+                array[index] = new List<T>();
+            }
+
+            OnChange();
+            array[index].Add(item);
+
         }
 
         public void Clear()
         {
-            throw new NotImplementedException();
+            if (Count == 0)
+            {
+                return;
+            }
+
+            OnChange();
+
+            for (var i = 0; i < array.Length; i++)
+            {
+                array[i] = null;
+            }
         }
 
         public bool Contains(T item)
         {
-            throw new NotImplementedException();
+            var index = GetIndex(item);
+            return array[index] == null ? false : array[index].Contains(item);
         }
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
+            if (arrayIndex < 0 || arrayIndex >= array.Length)
+            {
+                throw new IndexOutOfRangeException("Ошибка: индекс вышел за пределы массива");
+            }
+
+            var index = arrayIndex;
+
+            foreach (var list in this.array)
+            {
+                if (list == null)
+                {
+                    continue;
+                }
+
+                foreach (var item in list)
+                {
+                    array[index] = item;
+                    index++;
+                }
+            }
         }
 
         public IEnumerator<T> GetEnumerator()
         {
-            throw new NotImplementedException();
+            var changes = changesCount;
+
+            foreach (var list in array)
+            {
+                if (list == null)
+                {
+                    continue;
+                }
+
+                foreach (var item in list)
+                {
+                    yield return item;
+                    if (changes != changesCount)
+                    {
+                        throw new InvalidOperationException("Ошибка: коллекция не должна меняться во время работы перечислителя");
+                    }
+                }
+            }
         }
 
         public bool Remove(T item)
         {
-            throw new NotImplementedException();
+            var index = GetIndex(item);
+
+            if (array[index] == null)
+            {
+                return false;
+            }
+
+            var removed = array[index].Remove(item);
+
+            if (removed)
+            {
+                OnChange();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            throw new NotImplementedException();
+            return GetEnumerator();
         }
+
     }
 }
