@@ -239,6 +239,9 @@ namespace Trees
                     throw new InvalidOperationException("Ошибка: нельзя изменять дерево во время работы итератора");
                 }
 
+                //олордлдлодл
+
+
                 if (next.LeftChild != null)
                 {
                     queue.Enqueue(next.LeftChild);
