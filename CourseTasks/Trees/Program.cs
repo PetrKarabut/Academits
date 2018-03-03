@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,10 +11,11 @@ namespace Trees
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Задано дерево такое же как в презентации лекции про деревья - на первом слайде");
+
+            Console.WriteLine("Задано дерево");
             Console.WriteLine();
 
-            var tree = new Tree<int>(new IntComparer());
+            var tree = new Tree<int>();
 
             tree.Insert(8);
             tree.Insert(3);
@@ -24,18 +26,20 @@ namespace Trees
             tree.Insert(4);
             tree.Insert(7);
             tree.Insert(13);
+            tree.Insert(5);
 
             WriteTree(tree);
             Console.WriteLine();
-            Console.WriteLine("Количество узлов: {0}",tree.GetCount());
+            Console.WriteLine("Количество узлов: {0}",tree.Count);
 
-            tree.Remove(3);
+            var removing = 3;
+            tree.Remove(removing);
             Console.WriteLine();
-            Console.WriteLine("Удалим 3 - получим:");
+            Console.WriteLine("Удалим {0} - получим:", removing);
             Console.WriteLine();
             WriteTree(tree);
             Console.WriteLine();
-            Console.WriteLine("Количество узлов: {0}", tree.GetCount());
+            Console.WriteLine("Количество узлов: {0}", tree.Count);
 
             Console.ReadKey();
         }

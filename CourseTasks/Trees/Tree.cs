@@ -9,21 +9,29 @@ namespace Trees
 {
     class Tree<T>
     {
-        private class TreeNode<T>
+        private class Node
         {
-            public TreeNode<T> LeftChild { get; set; }
+            public Node LeftChild { get; set; }
 
-            public TreeNode<T> RightChild { get; set; }
+            public Node RightChild { get; set; }
 
-            public T NodeValue { get; set; }
+            public T Value { get; set; }
 
-            public TreeNode(T data)
+            public Node(T data)
             {
-                NodeValue = data;
+                Value = data;
             }
         }
 
-        private TreeNode<T> root;
+        private class DefaultComparer : IComparer<T>
+        {
+            public int Compare(T x, T y)
+            {
+                return ((IComparable<T>)x).CompareTo(y);
+            }
+        }
+
+        private Node root;
 
         private int changesCount;
 
@@ -34,6 +42,25 @@ namespace Trees
             Comparer = comparer;
         }
 
+        public Tree()
+        {
+            var type = typeof(T);
+            var icomparable = typeof(IComparable<T>);
+            var interfaces = type.GetInterfaces();
+
+            if (interfaces.Contains(icomparable))
+            {
+                Comparer = new DefaultComparer();
+            }
+            else
+            {
+                throw new InvalidCastException($"Класс {type.Name} не реализует интерфейс IComparable<{type.Name}>. " +
+                    "Исполузуйте перегрузку конструктора.");
+            }
+        }
+
+        public int Count { get; private set; }
+
         private void OnChange()
         {
             changesCount++;
@@ -42,10 +69,11 @@ namespace Trees
         public void Insert(T data)
         {
             OnChange();
+            Count++;
 
             if (root == null)
             {
-                root = new TreeNode<T>(data);
+                root = new Node(data);
                 return;
             }
 
@@ -53,7 +81,7 @@ namespace Trees
 
             while (true)
             {
-                if (Comparer.Compare(data, currentNode.NodeValue) < 0)
+                if (Comparer.Compare(data, currentNode.Value) < 0)
                 {
                     if (currentNode.LeftChild != null)
                     {
@@ -61,7 +89,7 @@ namespace Trees
                     }
                     else
                     {
-                        currentNode.LeftChild = new TreeNode<T>(data);
+                        currentNode.LeftChild = new Node(data);
                         return;
                     }
                 }
@@ -73,14 +101,14 @@ namespace Trees
                     }
                     else
                     {
-                        currentNode.RightChild = new TreeNode<T>(data);
+                        currentNode.RightChild = new Node(data);
                         return;
                     }
                 }
             }
         }
 
-        private TreeNode<T> FindNode(T data, out TreeNode<T> parent)
+        private Node FindNode(T data, out Node parent)
         {
             if (root == null)
             {
@@ -89,10 +117,10 @@ namespace Trees
             }
 
             var current = root;
-            TreeNode<T> parentNode = null;
+            Node parentNode = null;
             while (true)
             {
-                var compareResult = Comparer.Compare(data, current.NodeValue);
+                var compareResult = Comparer.Compare(data, current.Value);
                 if (compareResult == 0)
                 {
                     parent = parentNode;
@@ -127,70 +155,70 @@ namespace Trees
             }
         }
 
-        public void Remove(T data)
+        private void ChangeChild(Node parent, Node node, Node newNode)
         {
-            TreeNode<T> parent;
+            if (parent == null)
+            {
+                return;
+            }
+
+            if (parent.LeftChild != node && parent.RightChild != node)
+            {
+                return;
+            }
+            else if (parent.LeftChild == node)
+            {
+                parent.LeftChild = newNode;
+                return;
+            }
+
+            parent.RightChild = newNode;
+        }
+
+        public bool Remove(T data)
+        {
+            Node parent;
             var node = FindNode(data, out parent);
 
             if (node == null)
             {
-                return;
+                return false;
             }
 
             OnChange();
-
-            if (parent == null)
-            {
-                root = null;
-                return;
-            }
+            Count--;
 
             if (node.LeftChild == null && node.RightChild == null)
             {
-                if (parent.LeftChild == node)
-                {
-                    parent.LeftChild = null;
-                    return;
-                }
+                ChangeChild(parent, node, null);
 
-                if (parent.RightChild == node)
+                if (root == node)
                 {
-                    parent.RightChild = null;
-                    return;
+                    root = null;
                 }
             }
             else if (node.RightChild == null)
             {
-                if (parent.LeftChild == node)
-                {
-                    parent.LeftChild = node.LeftChild;
-                    return;
-                }
+                ChangeChild(parent, node, node.LeftChild);
 
-                if (parent.RightChild == node)
+                if (root == node)
                 {
-                    parent.RightChild = node.LeftChild; ;
-                    return;
+                    root = node.LeftChild;
                 }
             }
             else if (node.LeftChild == null)
             {
-                if (parent.LeftChild == node)
-                {
-                    parent.LeftChild = node.RightChild;
-                    return;
-                }
+                ChangeChild(parent, node, node.RightChild);
 
-                if (parent.RightChild == node)
+                if (root == node)
                 {
-                    parent.RightChild = node.RightChild; ;
-                    return;
+                    root = node.RightChild;
                 }
             }
             else
             {
                 var left = node.RightChild;
-                TreeNode<T> parentOfLeft = null;
+                Node parentOfLeft = null;
 
                 while (left.LeftChild != null)
                 {
@@ -200,22 +228,25 @@ namespace Trees
 
                 if (parentOfLeft != null)
                 {
-                    parentOfLeft.LeftChild = null;
+                    parentOfLeft.LeftChild = left.RightChild;
                 }
 
-                if (parent.LeftChild == node)
+                ChangeChild(parent, node, left);
+
+                left.LeftChild = node.LeftChild;
+
+                if (node.RightChild != left)
                 {
-                    parent.LeftChild = left;
-                    return;
+                    left.RightChild = node.RightChild;
                 }
 
-                if (parent.RightChild == node)
+                if (root == node)
                 {
-                    parent.RightChild = left;
-                    return;
+                    root = left;
                 }
             }
 
+            return true;
         }
 
         public IEnumerable<T> Broadways()
@@ -226,21 +257,18 @@ namespace Trees
             }
 
             var changes = changesCount;
-            var queue = new Queue<TreeNode<T>>();
+            var queue = new Queue<Node>();
 
             queue.Enqueue(root);
             while (queue.Count > 0)
             {
                 var next = queue.Dequeue();
 
-                yield return next.NodeValue;
+                yield return next.Value;
                 if (changes != changesCount)
                 {
                     throw new InvalidOperationException("Ошибка: нельзя изменять дерево во время работы итератора");
                 }
-
-                //олордлдлодл
-
 
                 if (next.LeftChild != null)
                 {
@@ -260,7 +288,7 @@ namespace Trees
             return Visit(root);
         }
 
-        private IEnumerable<T> Visit(TreeNode<T> node)
+        private IEnumerable<T> Visit(Node node)
         {
             if (node == null)
             {
@@ -269,7 +297,7 @@ namespace Trees
 
             var changes = changesCount;
 
-            yield return node.NodeValue;
+            yield return node.Value;
             if (changes != changesCount)
             {
                 throw new InvalidOperationException("Ошибка: нельзя изменять дерево во время работы итератора");
@@ -304,14 +332,14 @@ namespace Trees
             }
 
             var changes = changesCount;
-            var stack = new Stack<TreeNode<T>>();
+            var stack = new Stack<Node>();
 
             stack.Push(root);
             while (stack.Count > 0)
             {
                 var next = stack.Pop();
 
-                yield return next.NodeValue;
+                yield return next.Value;
                 if (changes != changesCount)
                 {
                     throw new InvalidOperationException("Ошибка: нельзя изменять дерево во время работы итератора");
