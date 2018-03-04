@@ -27,6 +27,23 @@ namespace Trees
         {
             public int Compare(T x, T y)
             {
+                if (x == null)
+                {
+                    if (y == null)
+                    {
+                        return 0;
+                    }
+                    else
+                    {
+                        return -1;
+                    }
+                }
+
+                if (y == null)
+                {
+                    return 1;
+                }
+
                 return ((IComparable<T>)x).CompareTo(y);
             }
         }
@@ -155,7 +172,7 @@ namespace Trees
             }
         }
 
-        private void ChangeChild(Node parent, Node node, Node newNode)
+        private static void ChangeChild(Node parent, Node node, Node newNode)
         {
             if (parent == null)
             {
@@ -358,18 +375,5 @@ namespace Trees
 
             }
         }
-
-        public int GetCount()
-        {
-            var count = 0;
-
-            foreach (var node in Broadways())
-            {
-                count++;
-            }
-
-            return count;
-        }
-
     }
 }

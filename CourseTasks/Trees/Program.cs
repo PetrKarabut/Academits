@@ -30,7 +30,7 @@ namespace Trees
 
             WriteTree(tree);
             Console.WriteLine();
-            Console.WriteLine("Количество узлов: {0}",tree.Count);
+            Console.WriteLine("Количество узлов: {0}", tree.Count);
 
             var removing = 3;
             tree.Remove(removing);
