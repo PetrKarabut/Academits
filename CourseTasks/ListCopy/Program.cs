@@ -12,7 +12,7 @@ namespace ListCopy
         static void Main(string[] args)
         {
 
-            var node1 = new CopyOfList.Node("node1");
+           /* var node1 = new CopyOfList.Node("node1");
             var node2 = new CopyOfList.Node("node2");
             var node3 = new CopyOfList.Node("node3");
             var node4 = new CopyOfList.Node("node4");
@@ -41,7 +41,7 @@ namespace ListCopy
             
             Console.WriteLine(list);
 
-            Console.WriteLine(CopyOfList.Clone(list));
+            Console.WriteLine(CopyOfList.Clone(list));*/
 
             Console.ReadKey();
         }

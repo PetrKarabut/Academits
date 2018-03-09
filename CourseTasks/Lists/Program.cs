@@ -10,6 +10,29 @@ namespace Lists
     {
         static void Main(string[] args)
         {
+            var list = new SimplyConnectedList<int>();
+
+            for (var i = 9; i >= 0; i--)
+            {
+                list.InsertInBegining(i);
+            }
+
+            var random = new Random();
+            for (var i = 0; i < 10; i++)
+            {
+                list.SetReference(i, random.Next(-2, 9));
+            }
+
+            Console.WriteLine(list);
+            Console.WriteLine();
+            Console.WriteLine(list.Copy());
+
+            Console.ReadKey();
+        }
+
+
+        private static void Check()
+        {
             var size = 7;
             var range = 99;
 

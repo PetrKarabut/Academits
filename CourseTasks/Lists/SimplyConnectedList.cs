@@ -14,11 +14,13 @@ namespace Lists
 
             public Unit Next { get; set; }
 
+            public Unit Reference { get; set; }
+
             public Unit(T value)
             {
                 Value = value;
             }
-            
+
         }
 
         private Unit head;
@@ -68,7 +70,7 @@ namespace Lists
             }
 
             return GetUnit(index).Value;
-           
+
         }
 
         public T SetValue(int index, T value)
@@ -164,7 +166,7 @@ namespace Lists
             var previous = head;
             for (var i = 0; i < Count - 1; i++)
             {
-                if (Equals(previous.Next.Value,value))
+                if (Equals(previous.Next.Value, value))
                 {
                     previous.Next = previous.Next.Next;
                     Count--;
@@ -234,28 +236,71 @@ namespace Lists
             var builder = new StringBuilder();
             while (unit != null)
             {
-                builder.Append(unit.Value).Append(" ");
+                var reference = "null";
+
+                if (unit.Reference != null)
+                {
+                    reference = unit.Reference.Value.ToString();
+                }
+
+                builder.Append(unit.Value + " " + reference + Environment.NewLine);
                 unit = unit.Next;
             }
 
             return builder.ToString();
         }
 
-        public T[] ToArray()
+        public void SetReference(int index, int referenceIndex)
         {
-            var values = new T[Count];
-            var i = 0;
+            GetUnit(index).Reference = referenceIndex >= 0 ? GetUnit(referenceIndex) : null;
+        }
+
+
+        public SimplyConnectedList<T> Copy()
+        {
+            var array = new Unit[Count];
             var unit = head;
+            var j = 0;
             while (unit != null)
             {
-                values[i] = unit.Value;
+                array[j] = unit;
                 unit = unit.Next;
-                i++;
+                j++;
             }
 
-            return values;
-          
+            var newArray = new Unit[Count];
+
+            for (var i = 0; i < Count; i++)
+            {
+                newArray[i] = new Unit(array[i].Value);
+            }
+
+
+            for (var i = 0; i < Count; i++)
+            {
+                var index = Array.IndexOf(array, array[i].Reference);
+
+                if (index >= 0)
+                {
+                    newArray[i].Reference = newArray[index];
+                }
+            }
+
+            var list = new SimplyConnectedList<T>();
+
+            list.head = newArray[0];
+            unit = list.head;
+
+            for (var i = 1; i < Count; i++)
+            {
+                unit.Next = newArray[i];
+                unit = unit.Next;
+            }
+
+            return list;
+
         }
+
 
     }
 }
