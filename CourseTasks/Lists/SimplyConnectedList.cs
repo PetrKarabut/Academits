@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Lists
 {
-    class SimplyConnectedList<T>
+    public class SimplyConnectedList<T>
     {
         private class Unit
         {
@@ -239,6 +239,22 @@ namespace Lists
             }
 
             return builder.ToString();
+        }
+
+        public T[] ToArray()
+        {
+            var values = new T[Count];
+            var i = 0;
+            var unit = head;
+            while (unit != null)
+            {
+                values[i] = unit.Value;
+                unit = unit.Next;
+                i++;
+            }
+
+            return values;
+          
         }
 
     }

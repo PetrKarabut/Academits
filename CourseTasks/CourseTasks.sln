@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trees", "Trees\Trees.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graphs", "Graphs\Graphs.csproj", "{75CF7DAF-462B-428D-92AA-1754B4DEDB84}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ListCopy", "ListCopy\ListCopy.csproj", "{654ECBD5-1995-4D46-9104-F942245D1070}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{75CF7DAF-462B-428D-92AA-1754B4DEDB84}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75CF7DAF-462B-428D-92AA-1754B4DEDB84}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75CF7DAF-462B-428D-92AA-1754B4DEDB84}.Release|Any CPU.Build.0 = Release|Any CPU
+		{654ECBD5-1995-4D46-9104-F942245D1070}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{654ECBD5-1995-4D46-9104-F942245D1070}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{654ECBD5-1995-4D46-9104-F942245D1070}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{654ECBD5-1995-4D46-9104-F942245D1070}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
