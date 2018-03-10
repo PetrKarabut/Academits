@@ -258,6 +258,11 @@ namespace Lists
 
         public SimplyConnectedList<T> Copy()
         {
+            if (Count == 0)
+            {
+                return new SimplyConnectedList<T>();
+            }
+
             var array = new Unit[Count];
             var unit = head;
             var j = 0;
@@ -297,6 +302,7 @@ namespace Lists
                 unit = unit.Next;
             }
 
+            list.Count = Count;
             return list;
 
         }
