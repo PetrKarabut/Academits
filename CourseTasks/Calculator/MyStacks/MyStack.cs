@@ -29,7 +29,7 @@ namespace StackCalculator.MyStacks
         {
             if (Count == 0)
             {
-                throw new InvalidOperationException("Стек пуст.");
+                throw new StacksException("Стек пуст.");
             }
 
             var item = top.Value;
@@ -42,7 +42,7 @@ namespace StackCalculator.MyStacks
         {
             if (Count == 0)
             {
-                throw new InvalidOperationException("Стек пуст.");
+                throw new StacksException("Стек пуст.");
             }
 
             var item = top.Value;

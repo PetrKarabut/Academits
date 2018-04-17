@@ -93,14 +93,7 @@ namespace StackCalculator
                 if (next is Operation)
                 {
                     var operand1 = (Operand)stack.Pop();
-                    var unar = ((Operation)next).CanBeUnary;
-                    var operand2 = new Operand(0);
-
-                    if (!unar || stack.Count > 0)
-                    {
-                        operand2 = (Operand)stack.Pop();
-                    }
-
+                    var operand2 = (Operand)stack.Pop();
                     var result = ((Operation)next).Result(operand2.Value, operand1.Value);
                     stack.Push(new Operand(result));
                 }

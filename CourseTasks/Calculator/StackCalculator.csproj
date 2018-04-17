@@ -48,12 +48,9 @@
     <Compile Include="Lexemes\OpenBracket.cs" />
     <Compile Include="Lexemes\Operand.cs" />
     <Compile Include="Lexemes\Operation.cs" />
-    <Compile Include="Lexemes\Operations\Division.cs" />
-    <Compile Include="Lexemes\Operations\Minus.cs" />
-    <Compile Include="Lexemes\Operations\Multiplication.cs" />
-    <Compile Include="Lexemes\Operations\Plus.cs" />
     <Compile Include="MyStacks\MyQueue.cs" />
     <Compile Include="MyStacks\MyStack.cs" />
+    <Compile Include="MyStacks\StacksException.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reader.cs" />

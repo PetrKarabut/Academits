@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using StackCalculator.Lexemes;
-using StackCalculator.Lexemes.Operations;
 using StackCalculator.MyStacks;
 
 namespace StackCalculator
@@ -19,6 +18,8 @@ namespace StackCalculator
         private CloseBracket closeBracket;
 
         private OpenBracket openBracket;
+
+        private Operand zero;
 
         private enum State
         {
@@ -38,22 +39,28 @@ namespace StackCalculator
 
         private Dictionary<string, Operand> idNames;
 
+        private int bracketsCount;
+
 
         public Reader()
         {
-            binaryOperations = new Operation[] { new Plus(), new Minus(), new Multiplication(), new Division()};
+            binaryOperations = new Operation[] { Operation.Plus, Operation.Minus, Operation.Multiplication, Operation.Division};
 
             closeBracket = new CloseBracket();
             openBracket = new OpenBracket();
 
             nameBuilder = new StringBuilder();
             numberBuilder = new StringBuilder();
+
+            zero = new Operand(0);
         }
 
 
         public MyQueue<ILexeme> Read(string s, Dictionary<string, Operand> dictionary)
         {
             queue = new MyQueue<ILexeme>();
+
+            bracketsCount = 0;
 
             idNames = dictionary;
 
@@ -66,6 +73,16 @@ namespace StackCalculator
 
             EndName();
             EndNumber();
+
+            if (!(queue.Last is Operand) && queue.Last != closeBracket)
+            {
+                ThrowException("выражение должно заканчиваться на операнд или закрывающую скобку");
+            }
+
+            if (bracketsCount != 0)
+            {
+                ThrowException("количество открывающих и закрывающих скобок различно");
+            }
 
             return queue;
         }
@@ -109,7 +126,7 @@ namespace StackCalculator
 
             if (!char.IsWhiteSpace(c))
             {
-                ThrowException();
+                ThrowException("недопустимый символ " + c.ToString());
             }
         }
 
@@ -117,8 +134,12 @@ namespace StackCalculator
         {
             if (status == State.AfterOperation)
             {
-                ThrowException();
-                return;
+                ThrowException($"операция {operation.Text} следует сразу после другой операции");
+            }
+
+            if (operation.AllowsUnarForm && (status == State.AfterOpeningBracket || status == State.Begining))
+            {
+                queue.Enqueue(zero);
             }
 
             EndNumber();
@@ -132,26 +153,26 @@ namespace StackCalculator
         {
             if (status == State.AfterClosingBracket || status == State.InName || status == State.InNumber)
             {
-                ThrowException();
-                return;
+                ThrowException("открывающая скобка стоит сразу после операнда или закрывающей скобки");
             }
 
             queue.Enqueue(openBracket);
+            bracketsCount++;
             status = State.AfterOpeningBracket;
         }
 
 
         private void AddClosingBracket()
         {
-            if (status == State.Begining || status == State.AfterOpeningBracket || status == State.AfterClosingBracket)
+            if (status == State.Begining || status == State.AfterOpeningBracket || status == State.AfterOperation)
             {
-                ThrowException();
-                return;
+                ThrowException("закрывающая скобка стоит в начале или сразу после открывающей скобки или после операции");
             }
 
             EndName();
             EndNumber();
             queue.Enqueue(closeBracket);
+            bracketsCount--;
             status = State.AfterClosingBracket;
            
         }
@@ -161,8 +182,7 @@ namespace StackCalculator
         {
             if (status == State.AfterClosingBracket)
             {
-                ThrowException();
-                return;
+                ThrowException("цифра стоит сразу после закрывающей скобки");
             }
 
 
@@ -182,8 +202,7 @@ namespace StackCalculator
         {
             if (status == State.AfterClosingBracket || status == State.InNumber)
             {
-                ThrowException();
-                return;
+                ThrowException("цифра стоит сразу после закрывающей скобки или числа");
             }
 
             nameBuilder.Append(c);
@@ -217,29 +236,21 @@ namespace StackCalculator
             }
             else
             {
-                throw new FormatException($"идентификатор {s} неизвестен");
+                ThrowException($"идентификатор {s} неизвестен");
             }
 
             nameBuilder.Clear();
         }
 
 
-        private void ThrowException()
+        private void ThrowException(string s)
         {
-            throw new FormatException("Строка имеет неверный формат.");
+            numberBuilder.Clear();
+            nameBuilder.Clear();
+            throw new FormatException("Строка имеет неверный формат: " + s);
         }
 
-        public string GetLexemesString()
-        {
-            var s = new StringBuilder();
-
-            while (queue.Count > 0)
-            {
-                s.Append(queue.Dequeue().Text);
-            }
-
-            return s.ToString();
-        }
+       
 
     }
 }

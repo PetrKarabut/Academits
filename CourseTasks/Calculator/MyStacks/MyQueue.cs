@@ -16,6 +16,8 @@ namespace StackCalculator.MyStacks
 
         public int Count { get; private set; }
 
+        public T Last => last.Value;
+
         private Node first;
 
         private Node last; 
@@ -42,7 +44,7 @@ namespace StackCalculator.MyStacks
         {
             if (Count == 0)
             {
-                throw new InvalidOperationException("Очередь пуста.");
+                throw new StacksException("Очередь пуста.");
             }
 
             var item = first.Value;
