@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace StackCalculator.MyStacks
 {
-    public class StacksException : InvalidOperationException
+    public class StackException : InvalidOperationException
     {
-        public StacksException(string message) : base(message) { }
+        public StackException(string message) : base(message) { }
        
     }
 }

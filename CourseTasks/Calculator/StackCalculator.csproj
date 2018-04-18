@@ -48,9 +48,10 @@
     <Compile Include="Lexemes\OpenBracket.cs" />
     <Compile Include="Lexemes\Operand.cs" />
     <Compile Include="Lexemes\Operation.cs" />
+    <Compile Include="Lexemes\OperationException.cs" />
     <Compile Include="MyStacks\MyQueue.cs" />
     <Compile Include="MyStacks\MyStack.cs" />
-    <Compile Include="MyStacks\StacksException.cs" />
+    <Compile Include="MyStacks\StackException.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reader.cs" />

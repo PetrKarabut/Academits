@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using StackCalculator.Lexemes;
 using StackCalculator.MyStacks;
 
@@ -121,11 +119,11 @@ namespace StackCalculator
             {
                 return calculator.Calculate(lexemes);
             }
-            catch (StacksException)
+            catch (StackException)
             {
                 Console.WriteLine("Не удалось вычислить значение выражения: некорректное выражение");
             }
-            catch (Operation.OperationException e)
+            catch (OperationException e)
             {
                 Console.WriteLine(e.Message);
             }

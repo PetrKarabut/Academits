@@ -44,7 +44,7 @@ namespace StackCalculator.MyStacks
         {
             if (Count == 0)
             {
-                throw new StacksException("Очередь пуста.");
+                throw new StackException("Очередь пуста.");
             }
 
             var item = first.Value;
